@@ -1,0 +1,38 @@
+{
+  "Name": "mvpa 5-beta",
+  "Description": "model for the rhythm block dataset with 1 regressor for each repetition",
+  "Input": {
+    "task": "RhythmBlock"
+  },
+  "Steps": [
+    {
+      "Level": "run",
+      "Model": {
+        "X": [
+          "trial_type.block_simple_1",
+          "trial_type.block_complex_1",
+          "trial_type.block_simple_2",
+          "trial_type.block_complex_2",
+          "trial_type.block_simple_3",
+          "trial_type.block_complex_3",
+          "trial_type.block_simple_4",
+          "trial_type.block_complex_4",
+          "trial_type.block_simple_5",
+          "trial_type.block_complex_5",
+          "trans_x", "trans_y", "trans_z", "rot_x", "rot_y", "rot_z"
+        ]
+      },
+      "AutoContrasts": [
+          "trial_type.block_simple_1",
+          "trial_type.block_complex_1",
+          "trial_type.block_simple_2",
+          "trial_type.block_complex_2",
+          "trial_type.block_simple_3",
+          "trial_type.block_complex_3",
+          "trial_type.block_simple_4",
+          "trial_type.block_complex_4",
+          "trial_type.block_simple_5",
+          "trial_type.block_complex_5"]
+    }
+  ]
+}

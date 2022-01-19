@@ -1,0 +1,22 @@
+{
+  "Name": "RhythmBlock",
+  "Description": "contrasts for the rhythm block dataset",
+  "Input": {
+    "task": "RhythmBlock"
+  },
+  "Steps": [
+    {
+      "Level": "run",
+      "Model": {
+        "X": [
+          "trial_type.block_simple",
+          "trial_type.block_complex",
+          "trans_x", "trans_y", "trans_z", "rot_x", "rot_y", "rot_z"
+        ]
+      },
+      "AutoContrasts": [
+        "trial_type.block_simple",
+        "trial_type.block_complex"]
+    }
+  ]
+}

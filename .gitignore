@@ -1,0 +1,8 @@
+
+.DS_Store
+
+# Project specific
+options_task-*date*.json
+
+# OSX / *nix default autosave extension
+*.m~
