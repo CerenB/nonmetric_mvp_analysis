@@ -99,8 +99,13 @@ function accu = calculateMvpa(opt, roiSource)
         
         % use the ratios, instead of the voxel number:
         opt.mvpa.feature_selection_ratio_to_keep = opt.mvpa.ratioToKeep;
+        
+        % if SMA, double the voxel number
+        if strcmpi(opt.maskLabel{iMask}, 'sma')
+           opt.mvpa.feature_selection_ratio_to_keep = 2 * opt.mvpa.ratioToKeep;
+        end
 
-        % ROI mvpa analysis
+        % ROI mvp-analysis
         [pred, accuracy] = cosmo_crossvalidate(ds, ...
                                    @cosmo_classify_meta_feature_selection, ...
                                    partitions, opt.mvpa);
@@ -111,7 +116,8 @@ function accu = calculateMvpa(opt, roiSource)
         accu(count).subID = subID;
         accu(count).mask = opt.maskLabel{iMask};
         accu(count).maskVoxNb = maskVoxel;
-        accu(count).choosenVoxNb = opt.mvpa.feature_selection_ratio_to_keep;
+%         accu(count).choosenVoxNb = opt.mvpa.feature_selection_ratio_to_keep;
+        accu(count).choosenVoxNb = opt.mvpa.ratioToKeep;
         accu(count).image = opt.mvpa.map4D{iImage};
         accu(count).ffxSmooth = funcFWHM;
         accu(count).accuracy = accuracy;

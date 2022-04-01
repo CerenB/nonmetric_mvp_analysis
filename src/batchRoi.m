@@ -10,16 +10,16 @@ clc;
   run ../lib/CPP_SPM/initCppSpm.m;
    
   % load your options
-  opt = getOptionBlockMvpa();
+  opt = getOptionMvpa();
 
   %% make Freesurfer based ROIs
   
     % roi path
   parcelPath = fullfile(fileparts(mfilename('fullpath')), '..', ...
                         '..', '..', '..','RhythmCateg_ROI', 'freesurfer');
-  % which parcels to use?
+  % which parcels to use aud or BG?
   useAudParcel = 0;
-  
+  opt.maskFWHM = 2;
   % make rois
   % action 1 = makes individual/separate parcels and create binary masks
   % action 2 = combines the left hemisphere masks into 1 (e.g. left-basal
@@ -31,11 +31,11 @@ clc;
   
   
   useAudParcel = 1;
+  opt.maskFWHM = 2;
   action = 3;
   info = parcel2mask(action, parcelPath, opt, useAudParcel);
 
   action = 4;
-  opt.maskFWHM = 2;
   info = parcel2mask(action, parcelPath, opt, useAudParcel);
   
   %% make HMAT based ROIs
@@ -43,14 +43,14 @@ clc;
       '..', '..', '..', '..', 'RhythmCateg_ROI', 'hmat');
   
   % dont start from copying the raw masks
-  opt.copyRawToDerivatives.do = true;
+  opt.copyRawToDerivatives.do = false;
   
   % reslice the mask into mni  func space
   opt.reslice.do = true;
   
   % reslice mask to normalised func space
   % (only once is enough for MNI space roi)
-  opt.resliceFunc.do = false;
+  opt.resliceFunc.do = true;
   
   % transform space from "mni func image" to "individual func image"
   opt.inversTransform.do = true;

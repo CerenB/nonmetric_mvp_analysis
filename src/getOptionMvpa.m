@@ -9,9 +9,7 @@ function opt = getOptionMvpa()
   end
 
   % suject to run in each group
-  opt.subjects = {'001','002', '003', '004', '005', '006',...
-                  '007', '008', '009', '010', '011', ...
-                  '012', '013', '014','015', '016', '017', ...
+  opt.subjects = {'013', '014','015', '016', '017', ...
                   '018', '019', '020', '021', '023'};
 
 
@@ -21,7 +19,7 @@ function opt = getOptionMvpa()
   opt.realign.useUnwarp = true;
 
   % we stay in native space (that of the T1)
-  opt.space = 'individual'; % 'individual', 'MNI'
+  opt.space = 'MNI'; % 'individual', 'MNI'
 
   % The directory where the data are located
   opt.dataDir = fullfile(fileparts(mfilename('fullpath')), ...
@@ -32,10 +30,10 @@ function opt = getOptionMvpa()
 
   % multivariate
   opt.model.file = fullfile(fileparts(mfilename('fullpath')), '..', ...
-                            'model', 'model-RhythmBlockDecoding1_smdl.json');
+                            'model', 'model-NonmetricDecoding1_smdl.json');
 
   % task to analyze
-  opt.taskName = 'RhythmBlock';
+  opt.taskName = 'Nonmetric';
 
   opt.parallelize.do = false;
   opt.parallelize.nbWorkers = 1;
@@ -50,14 +48,14 @@ function opt = getOptionMvpa()
   
   % set cosmo mvpa structure
   opt.mvpa.condLabelNb = [1 2];
-  opt.mvpa.condLabelName = {'simple', 'complex'};
-  opt.mvpa.decodingCondition = 'simpleVscomplex';
+  opt.mvpa.condLabelName = {'simple', 'nonmetric'};
+  opt.mvpa.decodingCondition = 'simpleVsnonmetric';
   
   % define the 4D maps to be used
   opt.funcFWHM = 2;
 
   % take the most responsive xx nb of voxels
-  opt.mvpa.ratioToKeep = 300; % 100 150 250 350 420
+  opt.mvpa.ratioToKeep = 150; % 100 150 250 350 420
 
   % set which type of ffx results you want to use
   opt.mvpa.map4D = {'beta', 't_maps'};
@@ -68,7 +66,7 @@ function opt = getOptionMvpa()
 
   % cosmo options
   opt.mvpa.tool = 'cosmo';
-  % opt.mvpa.normalization = 'zscore';
+  opt.mvpa.normalization = 'zscore';
   opt.mvpa.child_classifier = @cosmo_classify_libsvm;
   opt.mvpa.feature_selector = @cosmo_anova_feature_selector;
 

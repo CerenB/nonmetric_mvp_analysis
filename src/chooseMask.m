@@ -55,7 +55,7 @@ switch lower(roiSource)
             'hemi-l_space-individual_label-FSauditorycx_desc-decS1Thres5_mask.nii', ...
             'hemi-l_space-individual_label-FSbasalganglia_mask.nii', ...
             'hemi-r_space-individual_label-FSbasalganglia_mask.nii'};
-        
+
         % use in output roi name
         opt.maskLabel = {'leftAud', 'rightAud', 'leftBG', 'rightBG'};
         
@@ -75,7 +75,7 @@ switch lower(roiSource)
             'hemi-r_space-individual_label-HMATPMd_desc-inverseTransform_mask.nii', ...
             'hemi-r_space-individual_label-HMATpreSMA_desc-inverseTransform_mask.nii', ...
             'hemi-r_space-individual_label-HMATSMA_desc-inverseTransform_mask.nii'};
-        
+
         % use in output roi name
         opt.maskLabel = {'leftPremotor', 'leftpreSMA', 'leftSMA', ...
             'rightPremotor', 'rightpreSMA', 'rightSMA'};

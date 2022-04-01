@@ -21,12 +21,12 @@ clc;
   
      
   % load your options
-  opt = getOptionBlockMvpa();
+  opt = getOptionMvpa();
 
   %% run mvpa 
   
   % use parcels or NS masks?
-  roiSource = 'hmat'; % 'freesurfer', 'neurosynth', ...
+  roiSource = 'neurosnyth'; % 'freesurfer', 'neurosynth', 'hmat'
   accuracy = calculateMvpa(opt, roiSource);
   
   

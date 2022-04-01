@@ -1,8 +1,8 @@
 {
-  "Name": "RhythmBlock",
+  "Name": "Nonmetric",
   "Description": "contrasts for the rhythm block dataset",
   "Input": {
-    "task": "RhythmBlock"
+    "task": "Nonmetric"
   },
   "Steps": [
     {
@@ -10,13 +10,13 @@
       "Model": {
         "X": [
           "trial_type.block_simple",
-          "trial_type.block_complex",
+          "trial_type.block_nonmetric",
           "trans_x", "trans_y", "trans_z", "rot_x", "rot_y", "rot_z"
         ]
       },
       "AutoContrasts": [
         "trial_type.block_simple",
-        "trial_type.block_complex"]
+        "trial_type.block_nonmetric"]
     }
   ]
 }

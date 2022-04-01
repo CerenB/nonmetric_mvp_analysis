@@ -221,7 +221,7 @@ function info = parcel2mask(action, parcelPath, opt, useAudParcel)
           img = spm_read_vols(hdr);
 
           % decimalise the mask
-          hdr.dt = [16,0];
+          hdr.dt = [2,0];
 
           % rename
           p = bids.internal.parse_filename(spm_file(mask, 'filename'));
