@@ -29,6 +29,12 @@ function accu = calculateMvpa(opt, roiSource)
                           '_ratio', num2str(opt.mvpa.ratioToKeep ), ...
                           '_', datestr(now, 'yyyymmddHHMM'), '.csv']);
 
+  % anything to omit/midful about?
+  if opt.omit.subject.do == 1
+      omitSubject = [26,32];
+      omitMask = opt.omit.subject.mask;
+  end
+
   %% let's get going!
 
   % set structure array for keeping the results
@@ -57,6 +63,15 @@ function accu = calculateMvpa(opt, roiSource)
     % get subject folder name
     subFolder = ['sub-', subID];
 
+    
+    subType = 'badTapper';
+    subTypeLabel = 0;
+    % save good/bad tapper info
+    if ismember(str2double(subID),opt.tapper.good)
+        subType = 'goodTapper';
+        subTypeLabel = 1;
+    end
+    
     for iImage = 1:length(opt.mvpa.map4D)
 
       for iMask = 1:length(opt.maskName)
@@ -106,9 +121,23 @@ function accu = calculateMvpa(opt, roiSource)
         end
 
         % ROI mvp-analysis
-        [pred, accuracy] = cosmo_crossvalidate(ds, ...
+        if opt.omit.subject.do && contains(opt.maskName{iMask}, omitMask) && ...
+                ismember(str2double(subID), omitSubject)
+            pred = 'NA';
+            accuracy = 'NA';
+            if opt.mvpa.permutate  == 1
+                acc0 = 'NA';
+            end
+        else
+            [pred, accuracy] = cosmo_crossvalidate(ds, ...
                                    @cosmo_classify_meta_feature_selection, ...
                                    partitions, opt.mvpa);
+                               
+            if opt.mvpa.permutate  == 1
+                [acc0] = permuteAccuracy(ds,accuracy, partitions, opt.mvpa);
+                accu(count).permutation = acc0';
+            end                   
+        end
         
         
 
@@ -125,33 +154,8 @@ function accu = calculateMvpa(opt, roiSource)
         accu(count).imagePath = image;
         accu(count).roiSource = roiSource;
         accu(count).decodingCondition = opt.mvpa.decodingCondition;
-
-        %% PERMUTATION PART
-        if opt.mvpa.permutate  == 1
-          % number of iterations
-          nbIter = 100;
-
-          % allocate space for permuted accuracies
-          acc0 = zeros(nbIter, 1);
-
-          % make a copy of the dataset
-          ds0 = ds;
-
-          % for _niter_ iterations, reshuffle the labels and compute accuracy
-          % Use the helper function cosmo_randomize_targets
-          for k = 1:nbIter
-            ds0.sa.targets = cosmo_randomize_targets(ds);
-            [~, acc0(k)] = cosmo_crossvalidate(ds0, ...
-                                               @cosmo_meta_feature_selection_classifier, ...
-                                               partitions, opt.mvpa);
-          end
-
-          p = sum(accuracy < acc0) / nbIter;
-          fprintf('%d permutations: accuracy=%.3f, p=%.4f\n', nbIter, accuracy, p);
-
-          % save permuted accuracies
-          accu(count).permutation = acc0';
-        end
+        accu(count).subType = subType;
+        accu(count).subTypeLabel = subTypeLabel;
 
         % increase the counter and allons y!
         count = count + 1;

@@ -10,15 +10,59 @@ function [opt] = chooseMask(opt, roiSource)
 
 switch lower(roiSource)
     
+    
+    case 'contraststgonly'
+        
+        opt.maskPath = fullfile(fileparts(mfilename('fullpath')), '..', ...
+                                '..', '..', '..', 'RhythmCateg_ROI', roiSource);
+        % masks to decode/use
+        allMasks = dir(opt.maskPath);
+        allMasks([allMasks.isdir]) = [];
+        if allMasks(1).name =='.DS_Store'
+            allMasks(1) = [];
+        end
+        
+        for imask = 1:length(allMasks)
+            opt.maskName(imask) = {allMasks(imask).name};
+        end
+        
+        % use in output roi name
+        opt.maskLabel = {'lSTG_10mm', 'lSTG_15mm', 'lSTG_20mm',  ...
+                         'lSTG_nopitch_Block_p00001', 'lSTG_nopitch_Block_p0001', ...
+                         'rSTG_nopitch_Block_p00001', 'rSTG_nopitch_Block_p0001', ...
+                         'lSTG_nopitch_Nonmetric_p0001', 'rSTG_nopitch_Nonmetric_p0001', ...
+                         'lSTG_pitch_Block_p005', 'lSTG_pitch_Block_p00001', ... 
+                         'lSTG_pitch_Block_p0001', 'rSTG_pitch_Block_p005', ...
+                         'rSTG_pitch_Block_p00001', 'lSTG_pitch_Block_p0001', ...
+                         'lSTG_pitch_Nonmetric_p00001', 'lSTG_pitch_Nonmetric_p0001', ...
+                         'rSTG_pitch_Nonmetric_p00001', 'rSTG_pitch_Nonmetric_p0001', ...
+                         'rSTG_10mm', 'rSTG_15mm', 'rSTG_20mm'};
+        
+        
     case 'contrast'
         
         opt.maskPath = fullfile(fileparts(mfilename('fullpath')), '..', ...
                                 '..', '..', '..', 'RhythmCateg_ROI', roiSource);
         % masks to decode/use
-        opt.maskName = {'allSounds_Mask_p001.nii'};
+        opt.maskName = {'cerebellum_sphere-10mm_x-29_y--60_z--28.nii', ...
+                        'lpreM_sphere-10mm_x--49_y--5_z-47.nii', ...
+                        'rpreM_sphere-10mm_x-52_y-0_z-44.nii', ...
+                        'lSTG_sphere-10mm_x--42_y--31_z-11.nii', ...
+                        'rSTG_sphere-10mm_x-55_y--5_z-0.nii', ...
+                        'sma_sphere-15mm_x--3_y-0_z-63.nii'
+                        };
         
         % use in output roi name
-        opt.maskLabel = {'AllSoundsContrast'};
+        opt.maskLabel = {'cerebellum', 'lpreM', 'rpreM',  'lSTG', 'rSTG', 'SMA'};
+        
+%         opt.maskPath = fullfile(fileparts(mfilename('fullpath')), '..', ...
+%                                 '..', '..', '..', 'RhythmCateg_ROI', roiSource);
+%         % masks to decode/use
+%         opt.maskName = {'allSounds_Mask_p001.nii'};
+%         
+%         % use in output roi name
+%         opt.maskLabel = {'AllSoundsContrast'};
+
         
         
     case 'neurosnyth'

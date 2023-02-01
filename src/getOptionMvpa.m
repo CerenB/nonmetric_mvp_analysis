@@ -9,11 +9,12 @@ function opt = getOptionMvpa()
   end
 
   % suject to run in each group
-  opt.subjects = {'013', '014','015', '016', '017', ...
-                  '018', '019', '020', '021', '023'};
+  opt.subjects = {'013', '014', '015', '016', '017', ...
+                  '018', '019', '020', '021', '023', ...
+                  '024', '025', '026','027', '028', ...
+                  '029', '030', '031', '032', '033'}; 
 
 
-    
   % Uncomment the lines below to run preprocessing
   % - don't use realign and unwarp
   opt.realign.useUnwarp = true;
@@ -23,10 +24,15 @@ function opt = getOptionMvpa()
 
   % The directory where the data are located
   opt.dataDir = fullfile(fileparts(mfilename('fullpath')), ...
-                         '..', '..', '..', 'raw');
-  opt.derivativesDir = fullfile(opt.dataDir, '..', 'derivatives', 'cpp_spm');
+                         '..', '..', '..', 'nonmetric_raw');
+                     
+  opt.dir.derivatives = fullfile(opt.dataDir, '..', ...
+                                  'nonmetric_derivatives_cpp_spm');
+  opt.dir.stats = fullfile(opt.dataDir, '..', ...
+                                  'nonmetric_derivatives_cpp_spm-stats');                          
+  opt.dir.raw = opt.dataDir;
 
-  opt.pathOutput = fullfile(opt.dataDir, '..', 'derivatives', 'cosmoMvpa');
+  opt.pathOutput = fullfile(opt.dir.raw, '..', 'derivatives', 'cosmoMvpa');
 
   % multivariate
   opt.model.file = fullfile(fileparts(mfilename('fullpath')), '..', ...
@@ -55,7 +61,7 @@ function opt = getOptionMvpa()
   opt.funcFWHM = 2;
 
   % take the most responsive xx nb of voxels
-  opt.mvpa.ratioToKeep = 150; % 100 150 250 350 420
+  opt.mvpa.ratioToKeep = 120; % 100 150 250 350 420
 
   % set which type of ffx results you want to use
   opt.mvpa.map4D = {'beta', 't_maps'};
