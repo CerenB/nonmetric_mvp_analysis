@@ -6,3 +6,5 @@ options_task-*date*.json
 
 # OSX / *nix default autosave extension
 *.m~
+
+src/.Rhistory
