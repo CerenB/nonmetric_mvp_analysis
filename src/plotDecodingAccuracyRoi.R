@@ -17,11 +17,12 @@ library(ez)
 library(schoRsch)
 #######################################################
 
-# pathResults <- '/Users/battal/Cerens_files/fMRI/Processed/RhythmCateg/Nonmetric/derivatives/cosmoMvpa/'
-pathResults <- '/Users/battal/Cerens_files/fMRI/Processed/RhythmCateg/RhythmBlock/rhythmBlock_derivatives_cosmoMvpa/'
+pathResults <- '/Users/battal/Cerens_files/fMRI/Processed/RhythmCateg/Nonmetric/derivatives/cosmoMvpa/'
+# pathResults <- '/Users/battal/Cerens_files/fMRI/Processed/RhythmCateg/RhythmBlock/rhythmBlock_derivatives_cosmoMvpa/'
 
 ########
-mvpa <- read.csv(paste(pathResults, 'RhythmBlockDecoding_contrastSTGOnly_s2_ratio120_202302011234.csv', sep ='/'))
+mvpa <- read.csv(paste(pathResults, 'NonmetricDecoding_contrastSTGOnly_s2_ratio120_202301251403.csv', sep ='/'))
+# NonmetricDecoding_contrastSTGOnly_s2_ratio120_202301251403
 # RhythmBlockDecoding_contrast_s2_ratio120_202302011140
 # RhythmBlockDecoding_contrastSTGOnly_s2_ratio120_202302011234
 
@@ -44,15 +45,28 @@ names(mvpa)[2] <- 'roi'
 
 # let's make a expType to split the no_pitch exp from pitch exp
 mvpa$subNb <- as.numeric(mvpa$subID)
-mvpa$expType<- ifelse(mvpa$subNb < 23, 'P4', 'P1')
+mvpa$expType<- ifelse(mvpa$subNb < 11, 'P4', 'P1') # 23 for RhythmBlock, 11 for Nonmetric
 mvpa$expType <-as.factor(mvpa$expType)
 
 #make roi order to call accordingly
-mvpa$roi_order <- ifelse(mvpa$roi == 'lSTG', 1,
-                          ifelse(mvpa$roi == 'rSTG', 2, 
-                                 ifelse(mvpa$roi == 'SMA', 3, 
-                                        ifelse(mvpa$roi == 'lpreM', 4,
-                                               ifelse(mvpa$roi == 'rpreM', 5,6)))))
+# mvpa$roi_order <- ifelse(mvpa$roi == 'lSTG', 1,
+#                           ifelse(mvpa$roi == 'rSTG', 2, 
+#                                  ifelse(mvpa$roi == 'SMA', 3, 
+#                                         ifelse(mvpa$roi == 'lpreM', 4,
+#                                                ifelse(mvpa$roi == 'rpreM', 5,6)))))
+
+
+mvpa$roi_order <- ifelse(mvpa$roi == 'lSTG_10mm', 2,
+                         ifelse(mvpa$roi == 'rSTG_10mm', 6, 
+                                ifelse(mvpa$roi == 'lSTG_15mm', 3, 
+                                       ifelse(mvpa$roi == 'rSTG_15mm', 7,
+                                              ifelse(mvpa$roi == 'lSTG_20mm', 4,
+                                                     ifelse(mvpa$roi == 'rSTG_20mm', 8,
+                                                            ifelse(mvpa$roi == 'lSTG_nopitch_Block_p00001', 1,
+                                                                   ifelse(mvpa$roi == 'rSTG_nopitch_Block_p00001', 5, 99))))))))
+
+# think about other ways of ordering with below function
+# mvpa$roi_order <- grepl('nopitch', mvpa$roi, fixed = TRUE)
 
 # currently we  don't have 2 hemispheres for every ROI
 # later on consider this separation for "Aud Cx only" analysis
@@ -74,6 +88,10 @@ subsetmvpa = subset(mvpa,expType == exp)
 subsetmvpa = subset(subsetmvpa, image == img)
 
 str(subsetmvpa)
+
+
+# let's subset it again with only 8 rois
+subsetmvpa<- subset(subsetmvpa, roi_order < 9)
 
 df <- summarySE(data = subsetmvpa, 
                 groupvars=c('roi_order','roi', 'subType'),
@@ -117,21 +135,21 @@ subsetmvpa %>%
 head(subsetmvpa)
 #subsetmvpa$accuracy <- subsetmvpa$accuracy + 50
 
-lSTG <-subset(subsetmvpa, roi =='lSTG')
-rSTG <-subset(subsetmvpa, roi =='rSTG')
-SMA <-subset(subsetmvpa, roi =='SMA')
-lpreM <-subset(subsetmvpa, roi =='lpreM')
-rpreM <-subset(subsetmvpa, roi =='rpreM')
-cerebellum <-subset(subsetmvpa, roi =='cerebellum')
+lSTG <-subset(subsetmvpa, roi =='lSTG_20mm')
+rSTG <-subset(subsetmvpa, roi =='rSTG_20mm')
+# SMA <-subset(subsetmvpa, roi =='SMA')
+# lpreM <-subset(subsetmvpa, roi =='lpreM')
+# rpreM <-subset(subsetmvpa, roi =='rpreM')
+# cerebellum <-subset(subsetmvpa, roi =='cerebellum')
 
 
 # sig dif than zero?
 t.test(lSTG$accuracy, mu = 0.5, alternative = 'greater') # t = 0.19825, df = 9, p-value = 0.4236
 t.test(rSTG$accuracy, mu = 0.5, alternative = 'greater') # t = 0.58585, df = 9, p-value = 0.2862
-t.test(lpreM$accuracy, mu = 0.5, alternative = 'greater') # t = 1.2451, df = 9, p-value = 0.1223
-t.test(rpreM$accuracy, mu = 0.5, alternative = 'greater') # t = 0, df = 9, p-value = 0.5
-t.test(SMA$accuracy, mu = 0.5, alternative = 'greater')  # t = 0.73855, df = 9, p-value = 0.2395
-t.test(cerebellum$accuracy, mu = 0.5, alternative = 'greater') # t = 0.41917, df = 9, p-value = 0.3425
+# t.test(lpreM$accuracy, mu = 0.5, alternative = 'greater') # t = 1.2451, df = 9, p-value = 0.1223
+# t.test(rpreM$accuracy, mu = 0.5, alternative = 'greater') # t = 0, df = 9, p-value = 0.5
+# t.test(SMA$accuracy, mu = 0.5, alternative = 'greater')  # t = 0.73855, df = 9, p-value = 0.2395
+# t.test(cerebellum$accuracy, mu = 0.5, alternative = 'greater') # t = 0.41917, df = 9, p-value = 0.3425
 
 
 
@@ -144,7 +162,7 @@ setlimit = c(0,1)
 setbreak = c(0,0.25, 0.5, 0.75, 1)
 
 
-rois = '6ROI'
+rois = '8ROI_orderLR'
 
 shapesize = 1
 shapetype = 21
@@ -168,7 +186,7 @@ cond2 = paste0(category2,' Good Tapper')
 cond3 = paste0(category1,' Bad Tapper')
 cond4 = paste0(category1,' Good Tapper')
 
-cond = 'Complex'
+cond = 'Nonmetric'
 
 ##### separate tappers
 fig <- ggplot(data = subsetmvpa, 
@@ -193,11 +211,11 @@ fig <- ggplot(data = subsetmvpa,
   ggtitle("") +
   ylab("") +
   xlab("") +
-  theme(axis.text.x=element_text(size=12, face = 'bold', angle=0, colour='black')) + # face = 'bold', 
+  theme(axis.text.x=element_text(size=8, face = 'bold', angle=0, colour='black')) + # face = 'bold', 
   theme(axis.text.y=element_text(size=12, angle=0, colour='black')) +
   theme(axis.title.y=element_text(size=10, angle=90, colour='black')) +
   scale_y_continuous(limits=setlimit, breaks=setbreak, position="left") +
-  # scale_x_discrete(labels = NULL )+
+  scale_x_discrete(labels = c("lSTG All", "lSTG 10","lSTG 15","lSTG 20","rSTG All","rSTG 10","rSTG 15","rSTG 20"))+
   scale_color_manual(name = '', labels = c(cond1, cond2), values=c(nonmetricGrayBad, nonmetricGrayGood)) + 
   # theme(legend.position= "none")
   theme(legend.position= c(.85, .85)) +
@@ -205,7 +223,7 @@ fig <- ggplot(data = subsetmvpa,
   theme(legend.title=element_text(size=9))
 fig
 
-filename <- paste0(pathResults, 'Decoding_Simple_vs_',cond,  'voxelNb-', voxelSize, '_', rois, 'tappers.png')
+filename <- paste0(pathResults, 'Decoding_Simple_vs_',cond,  'voxelNb-', voxelSize, '_', rois,'tappers.png')
 # ggsave(filename, fig, dpi=300, width=15, height=6, units='cm') 
 ggsave(filename, fig, dpi=300, width=6, height=3) # 1024 x 512
 
@@ -236,12 +254,12 @@ fig <- ggplot(data = subsetmvpa,
   ggtitle("") +
   ylab("") +
   xlab("") +
-  theme(axis.text.x=element_text(size=12, face = 'bold', angle=0, colour='black')) + # face = 'bold', 
+  theme(axis.text.x=element_text(size=8, face = 'bold', angle=0, colour='black')) + # face = 'bold', 
   theme(axis.text.y=element_text(size=12, angle=0, colour='black')) +
   theme(axis.title.y=element_text(size=10, angle=90, colour='black')) +
   scale_y_continuous(limits=setlimit, breaks=setbreak, position="left") +
-  # scale_x_discrete(labels = NULL )+
-  scale_color_manual(name = '', labels =c('Simple vs. Complex'), values=c(nonmetricGrayGood)) + #
+  scale_x_discrete(labels = c("lSTG All", "lSTG 10","lSTG 15","lSTG 20","rSTG All","rSTG 10","rSTG 15","rSTG 20"))+
+  scale_color_manual(name = '', labels =c('Simple vs. Nonmetric'), values=c(nonmetricGrayGood)) + #
   theme(legend.position= c(.85, .9)) +
   theme(legend.text=element_text(size=9)) +
   theme(legend.title=element_text(size=9))
