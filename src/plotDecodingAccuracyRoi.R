@@ -186,7 +186,7 @@ cond2 = paste0(category2,' Good Tapper')
 cond3 = paste0(category1,' Bad Tapper')
 cond4 = paste0(category1,' Good Tapper')
 
-cond = 'Complex'
+cond = 'Nonmetric'
 
 ##### separate tappers
 fig <- ggplot(data = subsetmvpa, 
@@ -259,7 +259,7 @@ fig <- ggplot(data = subsetmvpa,
   theme(axis.title.y=element_text(size=10, angle=90, colour='black')) +
   scale_y_continuous(limits=setlimit, breaks=setbreak, position="left") +
   scale_x_discrete(labels = c("lSTG All", "lSTG 10","lSTG 15","lSTG 20","rSTG All","rSTG 10","rSTG 15","rSTG 20"))+
-  scale_color_manual(name = '', labels =c('Simple vs. Complex'), values=c(nonmetricGrayGood)) + #
+  scale_color_manual(name = '', labels =c('Simple vs. Nonmetric'), values=c(nonmetricGrayGood)) + #
   theme(legend.position= c(.85, .9)) +
   theme(legend.text=element_text(size=9)) +
   theme(legend.title=element_text(size=9))
