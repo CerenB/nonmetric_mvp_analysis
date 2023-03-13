@@ -124,6 +124,26 @@ switch lower(roiSource)
         opt.maskLabel = {'leftPremotor', 'leftpreSMA', 'leftSMA', ...
             'rightPremotor', 'rightpreSMA', 'rightSMA'};
         
+    case 'jubrainatlas'
+        
+         opt.maskPath = fullfile(fileparts(mfilename('fullpath')), '..', ...
+                                '..', '..', '..', 'RhythmCateg_ROI', ...
+                                roiSource, 'derivatives');
+                            
+         % masks to decode/use
+        allMasks = dir(opt.maskPath);
+        allMasks([allMasks.isdir]) = [];
+        if allMasks(1).name =='.DS_Store'
+            allMasks(1) = [];
+        end
+        
+        for imask = 1:length(allMasks)
+            opt.maskName(imask) = {allMasks(imask).name};
+        end
+        
+        % use in output roi name
+        opt.maskLabel = {};
+        
         
 end
 
