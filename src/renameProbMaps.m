@@ -1,4 +1,4 @@
-function zMap = renameProbMaps(inputImage,opt)
+function zMap = renameProbMaps(inputImage)
 % reads the probability images and renames them with bids rules
 
 p.filename = spm_file(inputImage, 'filename');

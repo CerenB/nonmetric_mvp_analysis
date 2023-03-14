@@ -14,7 +14,9 @@ function opt = getOptionMvpa()
                   '024', '025', '026','027', '028', ...
                   '029', '030', '031', '032', '033'}; 
 
-
+%   % bidspm adaptation - 13.03.2023
+%   opt = checkOptions(opt);
+  
   % Uncomment the lines below to run preprocessing
   % - don't use realign and unwarp
   opt.realign.useUnwarp = true;
@@ -33,10 +35,10 @@ function opt = getOptionMvpa()
   opt.dir.raw = opt.dataDir;
 
   opt.pathOutput = fullfile(opt.dir.raw, '..', 'derivatives', 'cosmoMvpa');
-
-  % multivariate
-  opt.model.file = fullfile(fileparts(mfilename('fullpath')), '..', ...
-                            'model', 'model-NonmetricDecoding1_smdl.json');
+% 
+%   % multivariate
+%   opt.model.file = fullfile(fileparts(mfilename('fullpath')), '..', ...
+%                             'model', 'model-NonmetricDecoding1_smdl.json');
 
   % task to analyze
   opt.taskName = 'Nonmetric';
@@ -46,8 +48,8 @@ function opt = getOptionMvpa()
   opt.parallelize.killOnExit = true;
 
   %% DO NOT TOUCH
-  opt = checkOptions(opt);
-  saveOptions(opt);
+  
+%  saveOptions(opt);
   % we cannot save opt with opt.mvpa, it crashes
 
   %% mvpa options
