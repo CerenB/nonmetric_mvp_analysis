@@ -8,15 +8,14 @@ function opt = getOptionMvpa()
     opt = [];
   end
 
+   
   % suject to run in each group
   opt.subjects = {'013', '014', '015', '016', '017', ...
                   '018', '019', '020', '021', '023', ...
                   '024', '025', '026','027', '028', ...
-                  '029', '030', '031', '032', '033'}; 
-
-%   % bidspm adaptation - 13.03.2023
-%   opt = checkOptions(opt);
+                  '029', '030', '031', '032', '033'};  
   
+  opt = checkOptions(opt);
   % Uncomment the lines below to run preprocessing
   % - don't use realign and unwarp
   opt.realign.useUnwarp = true;
@@ -35,20 +34,17 @@ function opt = getOptionMvpa()
   opt.dir.raw = opt.dataDir;
 
   opt.pathOutput = fullfile(opt.dir.raw, '..', 'derivatives', 'cosmoMvpa');
-% 
-%   % multivariate
-%   opt.model.file = fullfile(fileparts(mfilename('fullpath')), '..', ...
-%                             'model', 'model-NonmetricDecoding1_smdl.json');
+
+  % multivariate
+  opt.model.file = fullfile(fileparts(mfilename('fullpath')), '..', ...
+                            'model', 'model-NonmetricDecoding1_smdl.json');
 
   % task to analyze
   opt.taskName = 'Nonmetric';
 
-  opt.parallelize.do = false;
-  opt.parallelize.nbWorkers = 1;
-  opt.parallelize.killOnExit = true;
 
   %% DO NOT TOUCH
-  
+ 
 %  saveOptions(opt);
   % we cannot save opt with opt.mvpa, it crashes
 
@@ -63,7 +59,7 @@ function opt = getOptionMvpa()
   opt.funcFWHM = 2;
 
   % take the most responsive xx nb of voxels
-  opt.mvpa.ratioToKeep = 120; % 100 150 250 350 420
+  opt.mvpa.ratioToKeep = 150; % 100 150 250 350 420
 
   % set which type of ffx results you want to use
   opt.mvpa.map4D = {'beta', 't_maps'};
@@ -80,5 +76,9 @@ function opt = getOptionMvpa()
 
   % permute the accuracies ?
   opt.mvpa.permutate = 1;
+  
+  % want to still run mvpa although the mask is smaller than desired
+  % vx number? 
+  opt.mvpa.useMaskVoxelNumber = 1;
 
 end

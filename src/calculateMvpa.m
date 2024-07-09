@@ -58,15 +58,21 @@ function accu = calculateMvpa(opt, roiSource)
 
     % get FFX path
     subID = opt.subjects{iSub};
-    ffxDir = getFFXdir(subID, funcFWHM, opt);
-
+    
     % get subject folder name
     subFolder = ['sub-', subID];
-
     
+%    ffxDir = getFFXdir(subID, funcFWHM, opt);
+    ffxDir = fullfile(opt.dir.stats, ...
+                      subFolder, ...
+                      'stats',['task-',opt.taskName,...
+                      '_space-', opt.space, ...
+                      '_FWHM-', num2str(funcFWHM)]);
+
+    % save good/bad tapper info              
     subType = 'badTapper';
     subTypeLabel = 0;
-    % save good/bad tapper info
+    
     if ismember(str2double(subID),opt.tapper.good)
         subType = 'goodTapper';
         subTypeLabel = 1;
@@ -88,7 +94,34 @@ function accu = calculateMvpa(opt, roiSource)
         % 4D image
         imageName = ['4D_', opt.mvpa.map4D{iImage}, '_', num2str(funcFWHM), '.nii'];
         image = fullfile(ffxDir, imageName);
-
+        
+        % reslice the mask in subject specific folder
+        if opt.reslice.do == 1
+            
+            mask = resliceRoiImages(image, mask);
+            
+            % check if the image is binarized
+            hdr = spm_vol(mask);
+            maskVol = spm_read_vols(hdr);
+            maskVoxel = sum(maskVol(:));
+            
+           % isfloat(totalNbVoxels);
+            
+            % binarise
+            maskVol(maskVol <= 0.1) = 0.0;
+            maskVol(maskVol > 0) = 1.0;
+            
+            maskVoxel = sum(maskVol(:));
+            
+            % save binarized image
+            spm_write_vol(hdr, maskVol);
+            
+            %  mask = removePrefix(mask, ...
+            %      spm_get_defaults('realign.write.prefix'));
+            
+        end
+        
+        
         % load cosmo input
         ds = cosmo_fmri_dataset(image, 'mask', mask);
 
@@ -114,6 +147,14 @@ function accu = calculateMvpa(opt, roiSource)
         
         % use the ratios, instead of the voxel number:
         opt.mvpa.feature_selection_ratio_to_keep = opt.mvpa.ratioToKeep;
+        
+        % want to still run mvpa although the mask is smaller than desired
+        % vx number?
+        if opt.mvpa.useMaskVoxelNumber
+            if maskVoxel < opt.mvpa.ratioToKeep
+                opt.mvpa.feature_selection_ratio_to_keep = maskVoxel;
+            end
+        end
         
         % if SMA, double the voxel number
         if strcmpi(opt.maskLabel{iMask}, 'sma')
@@ -144,8 +185,10 @@ function accu = calculateMvpa(opt, roiSource)
         %% store output
         accu(count).subID = subID;
         accu(count).mask = opt.maskLabel{iMask};
+        if isfield(opt,'maskHemisphere')
+            accu(count).hemisphere = opt.maskHemisphere{iMask};
+        end
         accu(count).maskVoxNb = maskVoxel;
-%         accu(count).choosenVoxNb = opt.mvpa.feature_selection_ratio_to_keep;
         accu(count).choosenVoxNb = opt.mvpa.ratioToKeep;
         accu(count).image = opt.mvpa.map4D{iImage};
         accu(count).ffxSmooth = funcFWHM;
