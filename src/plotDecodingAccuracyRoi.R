@@ -20,11 +20,13 @@ library(schoRsch)
 library(afex) # mixed models
 #######################################################
 
-pathResults <- '/Users/battal/Cerens_files/fMRI/Processed/RhythmCateg/Nonmetric/derivatives/cosmoMvpa/'
+pathResults <- '/Volumes/extreme/Cerens_files/fMRI/RhythmCateg/Nonmetric/derivatives/cosmoMvpa/'
+
+# pathResults <- '/Users/battal/Cerens_files/fMRI/Processed/RhythmCateg/Nonmetric/derivatives/cosmoMvpa/'
 # pathResults <- '/Users/battal/Cerens_files/fMRI/Processed/RhythmCateg/RhythmBlock/rhythmBlock_derivatives_cosmoMvpa/'
 
 ########
-mvpa <- read.csv(paste(pathResults, 'NonmetricDecoding_grahn2007_s2_ratio150_202405221549.csv', sep ='/'))
+mvpa <- read.csv(paste(pathResults, 'NonmetricDecoding_contrast_s2_ratio150_202405311111.csv', sep ='/'))
 
 # UPDATE on 21/03/2025 
 # organising here and there
