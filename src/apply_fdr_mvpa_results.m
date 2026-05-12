@@ -30,6 +30,7 @@ clearvars -except results useFamilies;
 close all;
 
 resultsPath = '/Volumes/extreme/Cerens_files/fMRI/RhythmCateg/Nonmetric/derivatives/cosmoMvpa/';
+% resultsPath = '/Volumes/extreme/Cerens_files/fMRI/RhythmCateg/RhythmBlock/derivatives/cosmoMvpa/';
 inputPath = fullfile(resultsPath, 'permutation');
 
 if useFamilies
@@ -39,7 +40,7 @@ else
 end
 
 % Find the input file matching the pattern using dir()
-filePattern = fullfile(inputPath, 'PermutedAccuracy_nonmetric_group*.mat');
+filePattern = fullfile(inputPath, 'PermutedAccuracy_*_group*.mat');
 matches = dir(filePattern);
 matches = matches(~contains({matches.name}, '_fdr'));
 if isempty(matches)

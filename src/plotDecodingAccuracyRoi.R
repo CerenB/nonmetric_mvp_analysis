@@ -6,7 +6,10 @@ library(cowplot)
 library(Rmisc)
 library(stringr)
 
-library(gghalves)  # For half violin plot
+# library(gghalves)  # For half violin plot - doesn't work in 2026 May
+# install.packages("ggdist") # 2026 May edition for half violin plots
+library(ggdist)
+
 library(extrafont) # for avenir font
 
 # analysis libraries
@@ -20,13 +23,13 @@ library(schoRsch)
 library(afex) # mixed models
 #######################################################
 
-pathResults <- '/Volumes/extreme/Cerens_files/fMRI/RhythmCateg/Nonmetric/derivatives/cosmoMvpa/'
+pathResults <- '/Volumes/extreme/Cerens_files/fMRI/RhythmCateg/RhythmBlock/derivatives/cosmoMvpa/'
 
 # pathResults <- '/Users/battal/Cerens_files/fMRI/Processed/RhythmCateg/Nonmetric/derivatives/cosmoMvpa/'
 # pathResults <- '/Users/battal/Cerens_files/fMRI/Processed/RhythmCateg/RhythmBlock/rhythmBlock_derivatives_cosmoMvpa/'
 
 ########
-mvpa <- read.csv(paste(pathResults, 'NonmetricDecoding_contrast_s2_ratio150_202405311111.csv', sep ='/'))
+mvpa <- read.csv(paste(pathResults, 'RhythmBlockDecoding_contrast_s2_ratio150_202405311129.csv', sep ='/'))
 
 # UPDATE on 21/03/2025 
 # organising here and there
@@ -69,26 +72,26 @@ names(mvpa)[2] <- 'roi'
 
 # let's make a expType to split the no_pitch exp from pitch exp
 mvpa$subNb <- as.numeric(mvpa$subID)
-mvpa$expType<- ifelse(mvpa$subNb < 11, 'P4', 'P1') # 23 for RhythmBlock, 11 for Nonmetric
+mvpa$expType<- ifelse(mvpa$subNb < 23, 'P4', 'P1') # 23 for RhythmBlock, 11 for Nonmetric
 mvpa$expType <-as.factor(mvpa$expType)
 
 #make roi order to call accordingly
-# mvpa$roi_order <- ifelse(mvpa$roi == 'lSTG', 1,
-#                           ifelse(mvpa$roi == 'rSTG', 2,
-#                                  ifelse(mvpa$roi == 'SMA', 3,
-#                                                ifelse(mvpa$roi == 'lpreM', 4,
-#                                                       ifelse(mvpa$roi == 'rpreM', 5,6)))))
-
-
 mvpa$roi_order <- ifelse(mvpa$roi == 'lSTG', 1,
-                         ifelse(mvpa$roi == 'rSTG', 2,
-                                ifelse(mvpa$roi == 'lSMA', 3,
-                                       ifelse(mvpa$roi == 'rSMA', 4,
-                                              ifelse(mvpa$roi == 'lpreM', 5,
-                                                     ifelse(mvpa$roi == 'rpreM', 6,
-                                                            ifelse(mvpa$roi == 'lputa', 7,
-                                                                   ifelse(mvpa$roi == 'rputa', 8,
-                                                                          ifelse(mvpa$roi == 'lcereb', 9,10)))))))))
+                          ifelse(mvpa$roi == 'rSTG', 2,
+                                 ifelse(mvpa$roi == 'SMA', 3,
+                                               ifelse(mvpa$roi == 'lpreM', 4,
+                                                      ifelse(mvpa$roi == 'rpreM', 5,6)))))
+
+
+# mvpa$roi_order <- ifelse(mvpa$roi == 'lSTG', 1,
+#                          ifelse(mvpa$roi == 'rSTG', 2,
+#                                 ifelse(mvpa$roi == 'lSMA', 3,
+#                                        ifelse(mvpa$roi == 'rSMA', 4,
+#                                               ifelse(mvpa$roi == 'lpreM', 5,
+#                                                      ifelse(mvpa$roi == 'rpreM', 6,
+#                                                             ifelse(mvpa$roi == 'lputa', 7,
+#                                                                    ifelse(mvpa$roi == 'rputa', 8,
+#                                                                           ifelse(mvpa$roi == 'lcereb', 9,10)))))))))
 
 # mvpa$roi_order <- ifelse(mvpa$roi == 'lSTG_10mm', 2,
 #                          ifelse(mvpa$roi == 'rSTG_10mm', 6, 
@@ -137,7 +140,7 @@ mvpa$accuracy <-mvpa$accuracy*100
 
 # subset the dataframe for plotting/analysis
 img = 't_maps' # or 't_maps' 'beta'
-exp = 'P4' 
+exp = 'P1' 
 
 subsetmvpa = subset(mvpa,expType == exp)
 subsetmvpa = subset(subsetmvpa, image == img)
@@ -145,7 +148,7 @@ subsetmvpa = subset(subsetmvpa, image == img)
 str(subsetmvpa)
 
 
-# let's subset it again with only 8 rois
+# let's subset it again with only X rois
 #subsetmvpa<- subset(subsetmvpa, roi_order < 9)
 
 df <- summarySE(data = subsetmvpa, 
@@ -526,7 +529,7 @@ setlimit = c(20,85)  # nonmetric it's 10
 setbreak = c(20, 40, 60, 80)
 
 
-rois = 'Grahn2007ROIs_NonmetricExp' # RhythmBlockExp  NonmetricExp
+rois = 'RhythmBlockFixed' # RhythmBlockExp  NonmetricExp Grahn2007ROIs_NonmetricExp
 # rois = 'RhythmBlockContrastROIs_RhythmBlockExp'
 shapesize = 1
 shapetype = 21
@@ -544,15 +547,16 @@ jitter  = position_jitterdodge(0.3) # position_jitter(width=0.3)
 ##############
 
 # colors 
-colorchosen = '#ec5800'
+colorchosen = '#6B6B6B'
 
+# simple vs complex decoding: #ec5800
 # nonmetricGrayBad = "#9ec5aa" 
 # nonmetricGrayGood = "#3d8c55ff" # complex green= 3d8c55ff, nonmetricGrap = 6B6B6B 
 # simplePurpleBad = "#c4a4c9"
 # simplePurpleGood = "#8a4a95"
 
 # conditions
-cond = 'Complex' # Complex Nonmetric
+cond = 'Nonmetric' # Complex Nonmetric
 legendText = paste0(" Simple vs. ", cond)
 xLabel =c("L STG ", "R STG", "SMA","L PreM","R PreM","R Cereb")
 #xLabel =c("L STG ", "R STG","L SMA", "R SMA","L PreM","R PreM","L Puta","R Puta","L Cereb", "R Cereb")
@@ -602,34 +606,36 @@ ggsave(filename, fig, dpi=300, width=6, height=3) # 1024 x 512
 
 # violin plot trial 
 # 25.03.2025
-
+# also updated with new half-violin library on 11/05/2026
 ##############
-cond = 'Nonmetric'
-# new_roi_labels = c(
-#     "lSTG" = "L\nSTG",
-#     "rSTG" = "R\nSTG",
-#     "SMA" = "\nSMA",
-#     "lpreM" = "L\nPremotor",
-#     "rpreM" = "R\nPremotor",
-#     "rcereb" = "R\nCerebellum"
-#   )
+cond = 'Complex'
 
-# grahn 2007 rois
+# our contrast rois
 new_roi_labels = c(
-  "lSTG" = "L\nSTG",
-  "rSTG" = "R\nSTG",
-  "lSMA" = "L\nSMA",
-  "rSMA" = "r\nSMA",
-  "lpreM" = "L\nPremotor",
-  "rpreM" = "R\nPremotor",
-  "rcereb" = "R\nCerebellum",
-  "lcereb" = "L\nCerebellum",
-  "rputa" = "R\nPutamen",
-  "lputa" = "L\nPutamen"
-)
+    "lSTG" = "L\nSTG",
+    "rSTG" = "R\nSTG",
+    "SMA" = "\nSMA",
+    "lpreM" = "L\nPremotor",
+    "rpreM" = "R\nPremotor",
+    "rcereb" = "R\nCerebellum"
+  )
+
+# # grahn 2007 rois
+# new_roi_labels = c(
+#   "lSTG" = "L\nSTG",
+#   "rSTG" = "R\nSTG",
+#   "lSMA" = "L\nSMA",
+#   "rSMA" = "r\nSMA",
+#   "lpreM" = "L\nPremotor",
+#   "rpreM" = "R\nPremotor",
+#   "rcereb" = "R\nCerebellum",
+#   "lcereb" = "L\nCerebellum",
+#   "rputa" = "R\nPutamen",
+#   "lputa" = "L\nPutamen"
+# )
 
   
-colorchosen = '#1b131c'
+colorchosen = '#ec5800'
 # simpleOrange = '#ec5800'
 # nonmetricBlack= '#1b131c'
 
@@ -643,11 +649,20 @@ fig <- ggplot(data = subsetmvpa,
               aes(x = reorder(roi, roi_order), y = accuracy)) +
   
   # Half Violin Plot (Using Fixed Color)
-  geom_half_violin(position = position_nudge(x = -0.15), 
-                   side = "l", 
-                   alpha = 0.4, 
-                   fill = colorchosen,  # Use fixed color
-                   color = NA,  na.rm = TRUE) +
+  ggdist::stat_halfeye(
+    adjust = 0.5,
+    width = 0.5,
+    .width = 0,
+    justification = 1,
+    position = position_nudge(x = -0.15),
+    side = "left",
+    alpha = 0.4,
+    fill = colorchosen,  # Use fixed color
+    color = NA,
+    point_colour = NA,
+    interval_colour = NA,
+    na.rm = TRUE
+  ) +
   
   # Jittered Dot Plot (Using Fixed Color)
   geom_jitter(size = shapesize, shape = shapetype, stroke = shapestroke, 
@@ -668,7 +683,7 @@ fig <- ggplot(data = subsetmvpa,
   geom_hline(yintercept = 50, linetype = "dotted", colour = "black", size = .5) +
   
   # Labels & Theme
-  ggtitle("Simple vs. Nonmetric Classification") +
+  ggtitle("Simple vs. Complex Classification") +
   ylab("Classification accuracy %") +
   xlab("") +
   theme_classic() +
@@ -689,10 +704,11 @@ fig <- ggplot(data = subsetmvpa,
 
 fig
 
-filename <- paste0(pathResults, 'Grahn2007_Decoding_Simple_vs_',cond,
+filename <- paste0(pathResults, 'Decoding_Simple_vs_',cond,
                      '_voxelNb-', voxelSize,  '_', rois,'_', img, '_', exp, '.png')
 
-ggsave(filename, fig, dpi=300, width=10, height=3) # 1024 x 512 # width=6, height=3
+ggsave(filename, fig, dpi=300, width=6, height=3) # 1024 x 512 # width=6, height=3
+# for more ROIs, like Granh 2007: width=10, height=3
 
 
 
@@ -710,29 +726,30 @@ ggsave(filename, fig, dpi=300, width=10, height=3) # 1024 x 512 # width=6, heigh
 #                 measurevar='accuracy', na.rm = TRUE)
 # df
 
-# new_roi_labels = c(
-#   "lSTG" = "L\nSTG",
-#   "rSTG" = "R\nSTG",
-#   "SMA" = "\nSMA",
-#   "lpreM" = "L\nPremotor",
-#   "rpreM" = "R\nPremotor",
-#   "rcereb" = "R\nCerebellum"
-# )
-# grahn 2007 rois
 new_roi_labels = c(
   "lSTG" = "L\nSTG",
   "rSTG" = "R\nSTG",
-  "lSMA" = "L\nSMA",
-  "rSMA" = "r\nSMA",
+  "SMA" = "\nSMA",
   "lpreM" = "L\nPremotor",
   "rpreM" = "R\nPremotor",
-  "rcereb" = "R\nCerebellum",
-  "lcereb" = "L\nCerebellum",
-  "rputa" = "R\nPutamen",
-  "lputa" = "L\nPutamen"
+  "rcereb" = "R\nCerebellum"
 )
 
-colorchosen = '#1b131c'
+# # grahn 2007 rois
+# new_roi_labels = c(
+#   "lSTG" = "L\nSTG",
+#   "rSTG" = "R\nSTG",
+#   "lSMA" = "L\nSMA",
+#   "rSMA" = "r\nSMA",
+#   "lpreM" = "L\nPremotor",
+#   "rpreM" = "R\nPremotor",
+#   "rcereb" = "R\nCerebellum",
+#   "lcereb" = "L\nCerebellum",
+#   "rputa" = "R\nPutamen",
+#   "lputa" = "L\nPutamen"
+# )
+
+colorchosen = '#ec5800'
 # simpleOrange = '#ec5800'
 # nonmetricBlack= '#1b131c'
 
@@ -742,10 +759,20 @@ fig <- ggplot(data = subsetmvpa,
               aes(x = reorder(roi, roi_order), y = accuracy)) +  
   
   # Half Violin Plot (Using Fixed Color)
-  geom_half_violin(position = position_nudge(x = -0.15), 
-                   side = "l", alpha = 0.4, 
-                   fill = colorchosen,  
-                   color = NA, na.rm = TRUE) +
+  ggdist::stat_halfeye(
+    adjust = 0.5,
+    width = 0.5,
+    .width = 0,
+    justification = 1,
+    position = position_nudge(x = -0.15),
+    side = "left",
+    alpha = 0.4,
+    fill = colorchosen,
+    color = NA,
+    point_colour = NA,
+    interval_colour = NA,
+    na.rm = TRUE
+  ) +
   
   # Jittered Dot Plot with Shapes
   geom_jitter(aes(shape = subType),  # Only map shape here
@@ -767,7 +794,7 @@ fig <- ggplot(data = subsetmvpa,
   geom_hline(yintercept = 50, linetype = "dotted", colour = "black", size = .5) +
   
   # Labels & Theme
-  ggtitle("Simple vs. Nonmetric Classification") +
+  ggtitle("Simple vs. Complex Classification") +
   ylab("Classification accuracy %") +
   xlab("") +
   theme_classic() +
@@ -798,10 +825,10 @@ fig <- ggplot(data = subsetmvpa,
 
 fig
 
-filename <- paste0(pathResults, 'Grahn2007_Tappers_Decoding_Simple_vs_',cond,
+filename <- paste0(pathResults, 'Tappers_Decoding_Simple_vs_',cond,
                    '_voxelNb-', voxelSize,  '_', rois,'_', img, '_', exp, '.png')
 
-ggsave(filename, fig, dpi=300, width=10, height=3) # 1024 x 512
+ggsave(filename, fig, dpi=300, width=6, height=3) # 1024 x 512
 
 
 

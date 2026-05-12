@@ -1,20 +1,31 @@
-function pooledResults = Stelzer_nonmetric
+function results = Stelzer
 % Stelzer-style pooled permutation bootstrap + p-value computation
 % for the Nonmetric decoding dataset.
+% can also be used for RhythmBlock dataset by changing the paths/input .csv
+% file
+% groupMode: splits good/bad tappers if it's set to subType,  if it's set
+% to "all" it pools groups 
 
 clearvars;
 close all;
 
 NrPermutations = 100000;
+
+% change the task name and the input path according to the task/experiment
+taskName = 'Nonmetric'; % RhythmBlock
+% resultsPath = '/Volumes/extreme/Cerens_files/fMRI/RhythmCateg/RhythmBlock/derivatives/cosmoMvpa/';
 resultsPath = '/Volumes/extreme/Cerens_files/fMRI/RhythmCateg/Nonmetric/derivatives/cosmoMvpa/';
+% inputFileName = 'RhythmBlockDecoding_contrast_s2_ratio150_202405311129.mat';
 inputFileName = 'NonmetricDecoding_contrast_s2_ratio150_202405311111.mat';
+
+
 inputFile = fullfile(resultsPath, inputFileName);
 outputPath = fullfile(resultsPath, 'permutation');
 
 imageFilter = 't_maps';
 
 % Set to 'subType' to split good/bad tappers or 'all' to pool everyone.
-groupMode = 'subType';
+groupMode = 'all';
 groupField = 'subType';
 
 if ~exist(outputPath, 'dir')
@@ -48,22 +59,22 @@ if ~isfield(accu, 'subID')
 end
 
 subIds = arrayfun(@(x) str2double(x.subID), accu);
-isS4 = subIds >= 13 & subIds <= 23;
-isS1 = subIds >= 24 & subIds <= 33;
+if strcmp(taskName, 'RhythmBlock')
+    isP4 = subIds >= 1 & subIds <= 23;
+else
+    isP4 = subIds >= 13 & subIds <= 23;
+end
+isP1 = subIds >= 24 & subIds <= 33;
 
-P4.accu = accu(isS4);
-P1.accu = accu(isS1);
+P4.accu = accu(isP4);
+P1.accu = accu(isP1);
 
 dataSplits = struct('label', {'P4', 'P1'}, 'accu', {P4.accu, P1.accu});
 
-pValues = struct('dataset', {}, 'condition', {}, 'roi', {}, 'group', {}, ...
-                 'image', {}, 'p_value', {}, 'mean', {}, 'stderr', {}, ...
-                 'nSub', {});
-pooledResults = struct('dataset', {}, 'condition', {}, 'roi', {}, 'group', {}, ...
-                       'image', {}, 'observedAccuracy', {}, 'pooledPerm', {}, ...
-                       'nSub', {});
+results = struct('dataset', {}, 'condition', {}, 'roi', {}, 'group', {}, ...
+                'image', {}, 'p_value', {}, 'mean', {}, 'std', {}, 'stderr', {}, ...
+                'observedAccuracy', {}, 'pooledPerm', {}, 'nSub', {});
 count = 1;
-pooledCount = 1;
 
 for iSplit = 1:numel(dataSplits)
     splitLabel = dataSplits(iSplit).label;
@@ -132,26 +143,19 @@ for iSplit = 1:numel(dataSplits)
                 observations = sum(pooledPerm >= mu);
                 pValue = (observations + 1) / (NrPermutations + 1);
 
-                pValues(count).dataset = splitLabel;
-                pValues(count).condition = condition;
-                pValues(count).roi = roiName;
-                pValues(count).group = groupLabel;
-                pValues(count).image = imageFilter;
-                pValues(count).p_value = pValue;
-                pValues(count).mean = mu;
-                pValues(count).stderr = stderr;
-                pValues(count).nSub = numel(observedAccuracy);
+                results(count).dataset = splitLabel;
+                results(count).condition = condition;
+                results(count).roi = roiName;
+                results(count).group = groupLabel;
+                results(count).image = imageFilter;
+                results(count).p_value = pValue;
+                results(count).mean = mu;
+                results(count).std = std(observedAccuracy);
+                results(count).stderr = stderr;
+                results(count).observedAccuracy = observedAccuracy;
+                results(count).pooledPerm = pooledPerm;
+                results(count).nSub = numel(observedAccuracy);
                 count = count + 1;
-
-                 pooledResults(pooledCount).dataset = splitLabel;
-                 pooledResults(pooledCount).condition = condition;
-                 pooledResults(pooledCount).roi = roiName;
-                 pooledResults(pooledCount).group = groupLabel;
-                 pooledResults(pooledCount).image = imageFilter;
-                 pooledResults(pooledCount).observedAccuracy = observedAccuracy;
-                 pooledResults(pooledCount).pooledPerm = pooledPerm;
-                 pooledResults(pooledCount).nSub = numel(observedAccuracy);
-                 pooledCount = pooledCount + 1;
 
                 fprintf(['Done: dataset=%s, group=%s, roi=%s, condition=%s, ' ...
                          'nSub=%d, p=%.6f\n'], ...
@@ -161,10 +165,11 @@ for iSplit = 1:numel(dataSplits)
     end
 end
 
-save(fullfile(outputPath, 'PermutedAccuracy_nonmetric_results.mat'), ...
-    'pValues', 'pooledResults', 'S1', 'S4', 'groupMode', 'groupField', ...
+saveName = ['PermutedAccuracy_', taskName, '_group', groupMode, '_results.mat'];
+save(fullfile(outputPath, saveName), ...
+    'results', 'P1', 'P4', 'groupMode', 'groupField', ...
     'imageFilter', 'NrPermutations');
-disp('All done. Saved pooled permutations and p-values into one MAT file.');
+disp('All done. Saved unified results structure into one MAT file.');
 
 end
 
